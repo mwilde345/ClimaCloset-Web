@@ -12,12 +12,13 @@ export class AppComponent implements AfterViewInit {
   title = 'Clima Closet';
 
   public weatherCondition: string;
-  public cityTag = document.getElementById("location-city")
+  public cityTag: HTMLElement;
 
   constructor(private httpClient: HttpClient) {}
 
   ngAfterViewInit() {
     this.locate();
+    this.cityTag = document.getElementById("location-city")
   }
 
   public locate() {    
@@ -34,7 +35,10 @@ export class AppComponent implements AfterViewInit {
 
   public updateCity(lat: number, long: number) {
     const reverse = require('reverse-geocode')
-    console.log(reverse.lookup(lat, long, 'us'))    
+    let geoDataString : string = JSON.stringify(reverse.lookup(lat, long, 'us')); 
+    let geoData = JSON.parse(geoDataString);
+    let city = geoData.city; 
+    this.cityTag.innerHTML = city;
   }
 
 
