@@ -1,0 +1,72 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;      /*Body takes entire view of page*/
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(rgb(218, 218, 60),rgb(0, 204, 255));
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    color: white;
+}
+
+#location-city {
+    font-size: 40px;
+}
+
+.location, .temperature {
+    height: 30vh;
+    width: 200pt;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.temperature {
+    flex-direction: column;
+}
+
+.degree-section {
+    display: flex;
+    align-items:center;
+    cursor: pointer;
+}
+
+.degree-section span {
+    margin: 10px;
+}
+
+.degree-section h2 {
+    font-size:35px;
+}
+
+
+
+/* body {
+    background-image: url("https://i.pinimg.com/originals/66/fe/3f/66fe3fb9d3f51c1a781d45a32ab39935.jpg");
+}
+
+h1 {
+    font-family: Helvetica Neue, Helvetica, sans-serif;
+    font-size: 250%;
+    text-align: center;
+    color: turquoise;
+}
+
+.centerAligned {
+    text-align: center;
+}
+
+.searchButton {
+    margin-left: 10pt;
+}
+
+.outfitSuggestion {
+    text-align: center;
+    margin-top: 50pt;
+} */
