@@ -1,7 +1,7 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+.cntr-innr{
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
 }
 
 body {
@@ -12,7 +12,7 @@ body {
     align-items: center;
     background: linear-gradient(rgb(218, 218, 60),rgb(0, 204, 255));
     font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    color: white;
+    color: rgb(255, 255, 255);
 }
 
 #location-city {
@@ -28,7 +28,7 @@ body {
 }
 
 .temperature {
-    flex-direction: column;
+    flex-direction: row;
 }
 
 .degree-section {
@@ -37,7 +37,7 @@ body {
     cursor: pointer;
 }
 
-.degree-section span {
+.degree-section p {
     margin: 10px;
 }
 
@@ -45,28 +45,56 @@ body {
     font-size:35px;
 }
 
-
-
-/* body {
-    background-image: url("https://i.pinimg.com/originals/66/fe/3f/66fe3fb9d3f51c1a781d45a32ab39935.jpg");
-}
-
-h1 {
-    font-family: Helvetica Neue, Helvetica, sans-serif;
-    font-size: 250%;
-    text-align: center;
-    color: turquoise;
-}
-
-.centerAligned {
+.outfit {
     text-align: center;
 }
 
-.searchButton {
-    margin-left: 10pt;
+/*** STYLES ***/
+.search {
+	display: inline-block;
+	position: relative;
+	height: 35px;
+	width: 35px;
+    box-sizing: border-box;
+    /* Centers the text in the middle of the input box. */
+	margin: 0px 8px 7px 0px;
+	padding: 7px 9px 0px 9px;
+	border: 3px solid white;
+	border-radius: 25px;
+	transition: all 200ms ease;
+    cursor: text;
 }
 
-.outfitSuggestion {
-    text-align: center;
-    margin-top: 50pt;
+.search::after {
+    content: "";
+    position: absolute;
+    width: 3px;
+    height: 20px;
+    right: -5px;
+    top: 21px;
+    background: white;
+    border-radius: 3px;
+    transform: rotate(-45deg);
+    transition: all 200ms ease;
+}
+
+.search:active, .search:hover {
+    width: 200px;
+	margin-right: 0px;
+}
+/* .search::after {
+    height: 0px;	
 } */
+	
+input {
+	width: 100%;
+	border: none;
+	box-sizing: border-box;
+	font-family: Helvetica;
+	font-size: 15px;
+	color: inherit;
+	background: transparent;
+	outline-width: 0px;
+}
+
+
