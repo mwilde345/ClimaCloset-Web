@@ -20,18 +20,26 @@ import { LocationStrategy } from '@angular/common';
 export class AppComponent implements AfterViewInit {
   title = 'Clima Closet';
 
-  public API_KEY: string = "8300f2d4182612b5d44c3fcb22ca0acc"
+  public API_KEY: string = "8300f2d4182612b5d44c3fcb22ca0acc";
+  public ICON_URL: string = "http://openweathermap.org/img/wn/";
 
   //Variables holding fields for UI components.
   public city: string;  
+  public rawTemperature: number; 
   public temperature: number; 
   public condition: string;
+  public iconID: string;
 
   //UI HTML components. 
   public cityTag: HTMLElement;
   public temperatureTag: HTMLElement; 
+  public temperatureUnit: HTMLElement;
   public conditionTag: HTMLElement; 
+  public iconImage: HTMLImageElement; 
+  public outfitImage: HTMLElement;
+  public searchBar: HTMLInputElement;
 
+  public celsiusTemp: boolean = false;
 
 
   constructor(private httpClient: HttpClient) {}
@@ -40,7 +48,25 @@ export class AppComponent implements AfterViewInit {
     //Initialize HTML elements for DOM objects to access.
     this.cityTag = document.getElementById("location-city");
     this.temperatureTag = document.getElementById("temperature-degree");
+    this.temperatureUnit = document.getElementById("temperature-unit");
     this.conditionTag = document.getElementById("temperature-condition");
+    this.iconImage = document.getElementById("location-icon") as HTMLImageElement;
+    this.outfitImage = document.getElementById("outfit");
+    this.searchBar = document.getElementById("search_bar") as HTMLInputElement;
+
+    //Focus is when you are inside the search_bar.
+    this.searchBar.addEventListener('focus', () => {
+      this.searchBar.parentElement.style.width = '220px';
+      this.searchBar.parentElement.style.marginRight = '0px';
+    });
+
+    //Blur is when you are not clicked inside the search_bar. 
+    this.searchBar.addEventListener('blur', () => {
+      if(this.searchBar.value.length === 0) {
+        this.searchBar.parentElement.style.width = '35px';
+        this.searchBar.parentElement.style.marginRight = '0px';
+      }
+    });
 
     this.locate();
   }
@@ -72,9 +98,10 @@ export class AppComponent implements AfterViewInit {
         })
         .then(data => {
           console.log(data);
-          this.temperature = this.roundDigits(data.main.temp - 273.15); 
+          this.rawTemperature = this.roundDigits(data.main.temp);
           this.condition = data.weather[0].main;
           this.city = data.name;
+          this.iconID = data.weather[0].icon;
           console.log("Temp = " + this.temperature + " condition = " + this.condition);
           this.updateUI()
         });
@@ -82,12 +109,35 @@ export class AppComponent implements AfterViewInit {
 
   public updateUI() {
     this.cityTag.innerHTML = this.city;
-    this.temperatureTag.innerHTML = this.temperature+"";
     this.conditionTag.innerHTML = this.condition;
+    this.iconImage.src = this.ICON_URL + this.iconID + "@2x.png";
+    
+    var formattedTemperature = this.rawTemperature;
+
+    if(this.celsiusTemp) {
+      formattedTemperature -= 273.15;
+      this.temperatureUnit.innerHTML = "C";
+    }
+    else {
+      formattedTemperature = 9/5 * (formattedTemperature - 273.15) + 32;
+      this.temperatureUnit.innerHTML = "F";
+    }
+
+    this.temperatureTag.innerHTML = this.roundDigits(formattedTemperature) + "";
   }
 
   public roundDigits(temp: number) : number {
     return Math.round(temp * 100) / 100;
+  }
+
+  public switchTempUnit() {
+    this.celsiusTemp = !this.celsiusTemp;
+    this.updateUI();
+  }
+
+  public searchCity(event: KeyboardEvent) {
+    console.log("SEARCH");
+    
   }
 
  

@@ -21,7 +21,7 @@ body {
 
 .location, .temperature {
     height: 30vh;
-    width: 200pt;
+    width: 250pt;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -50,7 +50,7 @@ body {
 }
 
 /*** STYLES ***/
-.search {
+*.search {
 	display: inline-block;
 	position: relative;
 	height: 35px;
