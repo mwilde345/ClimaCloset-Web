@@ -5,11 +5,9 @@ import { LocationStrategy } from '@angular/common';
 
 /*
   TODO - 
-    1. Add image outfit to UI. 
-    2. Show icon of weather in UI. 
-    3. Show outfit for weather. 
     4. Search function for city.
-    5. Dynamic background based on time of day. 
+    5. Clean outfit imgs & display based on weather. 
+    6. Dynamic background based on time of day. 
 */
 
 @Component({
@@ -40,7 +38,6 @@ export class AppComponent implements AfterViewInit {
   public searchBar: HTMLInputElement;
 
   public celsiusTemp: boolean = false;
-
 
   constructor(private httpClient: HttpClient) {}
 
@@ -79,7 +76,7 @@ export class AppComponent implements AfterViewInit {
         let lat: number = position.coords.latitude;
         let long: number = position.coords.longitude;
         //this.updateCity(lat, long);
-        this.getWeatherData(lat, long)
+        this.buildURL(lat, long, "");
 
       })
     }
@@ -88,11 +85,12 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
-  public getWeatherData(lat: number, long: number) {
-    const proxy = "https://cors-anywhere.herokuapp.com/";   //proxy needed to go around http request error. 
-    const API_URL = proxy+"https://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+long+"&appid="+this.API_KEY;
+  public fetchAPI(url: string) {
+    //const proxy = "https://cors-anywhere.herokuapp.com/";   //proxy needed to go around http request error. 
+    //var API_URL = proxy+"https://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+long+"&appid="+this.API_KEY;
+
     //Get request & we are retrieving the data as a JSON. 
-    fetch(API_URL)
+    fetch(url)
         .then(response => {
           return response.json();
         })
@@ -136,8 +134,21 @@ export class AppComponent implements AfterViewInit {
   }
 
   public searchCity(event: KeyboardEvent) {
-    console.log("SEARCH");
+    this.city = this.searchBar.value;
+    this.buildURL(0, 0, this.city);
+  }
+
+  public buildURL(lat: number, long: number, city: string) {
+    const proxy = "https://cors-anywhere.herokuapp.com/";   //proxy needed to go around http request error. 
+    var API_URL = "";
+    if(city === "") {
+      API_URL = proxy+"https://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+long+"&appid="+this.API_KEY;
+    }
+    else {
+      API_URL = proxy+"https://api.openweathermap.org/data/2.5/weather?q="+city+"&appid="+this.API_KEY;
+    }
     
+    this.fetchAPI(API_URL);
   }
 
  
