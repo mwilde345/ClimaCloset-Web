@@ -5,7 +5,6 @@ import { LocationStrategy } from '@angular/common';
 
 /*
   TODO - 
-    4. Search function for city.
     5. Clean outfit imgs & display based on weather. 
     6. Dynamic background based on time of day. 
 */
@@ -39,6 +38,11 @@ export class AppComponent implements AfterViewInit {
 
   public celsiusTemp: boolean = false;
 
+  public averageOutfits: Array<String> = ["Average 1", "Average 2", "Average 3", "Average 4"];
+  public chillOutfits: Array<String> = ["Chill 1", "Chill 2", "Chill 3", "Chill 4", "Chill 5"]
+  public coldOutfits: Array<String> = ["Cold 1", "Cold 2", "Cold 3"]
+  public warmOutfits: Array<String> = ["Warm 1", "Warm 2", "Warm 3", "Warm 4"]
+
   constructor(private httpClient: HttpClient) {}
 
   ngAfterViewInit() {
@@ -66,6 +70,7 @@ export class AppComponent implements AfterViewInit {
     });
 
     this.locate();
+
   }
 
   public locate() {    
@@ -122,6 +127,23 @@ export class AppComponent implements AfterViewInit {
     }
 
     this.temperatureTag.innerHTML = this.roundDigits(formattedTemperature) + "";
+
+    var outfit: string = this.chooseOutfit();
+  }
+
+  public chooseOutfit() : string {
+    const temp: number = this.rawTemperature - 273.15;
+    const outfitType: string = this.getOutfitType(temp)
+
+    console.log(outfitType);
+    return ""
+  }
+
+  public getOutfitType(temp: number) : string {
+    if(temp < -5) return "cold";
+    if(temp >= -5 && temp < 9) return "chill";
+    if(temp >= 9 && temp < 16) return "average";
+    if(temp >= 17) return "warm";
   }
 
   public roundDigits(temp: number) : number {
