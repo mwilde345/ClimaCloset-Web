@@ -4,7 +4,9 @@ import { LocationStrategy } from '@angular/common';
 
 /*
   TODO - 
-    6. Dynamic background based on time of day. 
+    Dynamic background based on time of day. 
+    Add icon for webpage.
+    Remove placeholder text on page loading. 
 */
 
 @Component({
@@ -15,9 +17,14 @@ import { LocationStrategy } from '@angular/common';
 export class AppComponent implements AfterViewInit {
   title = 'Clima Closet';
 
+  //URLs + key needed for API calls. 
   public API_KEY: string = "8300f2d4182612b5d44c3fcb22ca0acc";
+  public API_URL_GPS: string = "https://api.openweathermap.org/data/2.5/weather?lat=";
+  public API_URL_CITY: string = "https://api.openweathermap.org/data/2.5/weather?q=";
   public ICON_URL: string = "http://openweathermap.org/img/wn/";
+  public proxy: string = "https://cors-anywhere.herokuapp.com/";   //proxy needed to go around http request error. 
 
+  //Image path to retrieve graphics. 
   public imagePath: string = "../assets/graphics/outfits/"
 
   //Variables holding fields for UI components.
@@ -57,13 +64,13 @@ export class AppComponent implements AfterViewInit {
     this.outfitImage = document.getElementById("outfit") as HTMLImageElement;
     this.searchBar = document.getElementById("search_bar") as HTMLInputElement;
 
-    //Focus is when you are inside the search_bar.
+    //Focus is when you are inside the search_bar => extend bar. 
     this.searchBar.addEventListener('focus', () => {
       this.searchBar.parentElement.style.width = '220px';
       this.searchBar.parentElement.style.marginRight = '0px';
     });
 
-    //Blur is when you are not clicked inside the search_bar. 
+    //Blur is when you are not clicked inside the search_bar => reduce bar. 
     this.searchBar.addEventListener('blur', () => {
       if(this.searchBar.value.length === 0) {
         this.searchBar.parentElement.style.width = '35px';
@@ -71,31 +78,51 @@ export class AppComponent implements AfterViewInit {
       }
     });
 
-    this.locate();
+    this.locate();    //Start with user location => locate & call API with user coordinates. 
 
   }
 
+
+  //Locate user on startup. 
   public locate() {    
     if(navigator.geolocation) {     //If we can retrieve the location
-      let lat = navigator.geolocation.getCurrentPosition(position => {
 
-        console.log(position);
+      let lat = navigator.geolocation.getCurrentPosition(position => {
         let lat: number = position.coords.latitude;
         let long: number = position.coords.longitude;
-        //this.updateCity(lat, long);
-        this.buildURL(lat, long, "");
+        this.buildURL(lat, long, "");     //Once we have coordinates => build URL for API call. 
+      });
 
-      })
     }
     else {
       this.cityTag.innerHTML = "Cannot retrieve location."
     }
   }
 
-  public fetchAPI(url: string) {
-    //const proxy = "https://cors-anywhere.herokuapp.com/";   //proxy needed to go around http request error. 
-    //var API_URL = proxy+"https://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+long+"&appid="+this.API_KEY;
 
+   //Find city for API call. 
+   public searchCity(event: KeyboardEvent) {
+    this.city = this.searchBar.value;
+    this.buildURL(0, 0, this.city);
+  }
+
+
+  //Helper function to build the endpoint URL for either coordinate or city API call. 
+  public buildURL(lat: number, long: number, city: string) {
+    var API_URL = "";
+    if(city === "") {
+      API_URL = this.proxy+this.API_URL_GPS+lat+"&lon="+long+"&appid="+this.API_KEY;
+    }
+    else {
+      API_URL = this.proxy+this.API_URL_CITY+city+"&appid="+this.API_KEY;
+    }
+    
+    this.fetchAPI(API_URL);
+  }
+
+
+  //Fetch all the needed information to populate UI. 
+  public fetchAPI(url: string) {
     //Get request & we are retrieving the data as a JSON. 
     fetch(url)
         .then(response => {
@@ -107,18 +134,18 @@ export class AppComponent implements AfterViewInit {
           this.condition = data.weather[0].main;
           this.city = data.name;
           this.iconID = data.weather[0].icon;
-          console.log("Temp = " + this.temperature + " condition = " + this.condition);
-          this.updateUI()
+          this.updateUI()         //Once all the data has been retrieved, we can update the UI. 
         });
   }
 
-  public updateUI() {
-    this.cityTag.innerHTML = this.city;
-    this.conditionTag.innerHTML = this.condition;
-    this.iconImage.src = this.ICON_URL + this.iconID + "@2x.png";
-    
-    var formattedTemperature = this.rawTemperature;
 
+  public updateUI() {
+    this.cityTag.innerHTML = this.city;       //City tag.
+    this.conditionTag.innerHTML = this.condition;     //Condition tag. 
+    this.iconImage.src = this.ICON_URL + this.iconID + "@2x.png";     //Icon tag. 
+    
+    //Temperature tag. 
+    var formattedTemperature = this.rawTemperature; 
     if(this.celsiusTemp) {
       formattedTemperature -= 273.15;
       this.temperatureUnit.innerHTML = "C";
@@ -127,11 +154,10 @@ export class AppComponent implements AfterViewInit {
       formattedTemperature = 9/5 * (formattedTemperature - 273.15) + 32;
       this.temperatureUnit.innerHTML = "F";
     }
+    this.temperatureTag.innerHTML = this.roundDigits(formattedTemperature) + "";    
 
-    this.temperatureTag.innerHTML = this.roundDigits(formattedTemperature) + "";
-
+    //Outfit tag. 
     var outfit: string = this.chooseOutfit();
-
     if(outfit === "cold") {
       const outfitID : number = Math.floor(Math.random() * 3)
       const outfitName: string = this.coldOutfits[outfitID];
@@ -152,49 +178,28 @@ export class AppComponent implements AfterViewInit {
       const outfitName: string = this.warmOutfits[outfitID];
       this.outfitImage.src = this.imagePath + outfitName + ".png";
     }
-
   }
 
+
+  //Decide what type of outfit should be chosen. 
   public chooseOutfit() : string {
     const temp: number = this.rawTemperature - 273.15;
-    const outfitType: string = this.getOutfitType(temp)
-
-    console.log(outfitType);
-    return outfitType;
-  }
-
-  public getOutfitType(temp: number) : string {
     if(temp < -5) return "cold";
     if(temp >= -5 && temp < 9) return "chill";
     if(temp >= 9 && temp < 16) return "average";
     if(temp >= 17) return "warm";
   }
 
-  public roundDigits(temp: number) : number {
-    return Math.round(temp * 100) / 100;
-  }
 
+  //Celsius <=> Farenheit. 
   public switchTempUnit() {
     this.celsiusTemp = !this.celsiusTemp;
     this.updateUI();
   }
 
-  public searchCity(event: KeyboardEvent) {
-    this.city = this.searchBar.value;
-    this.buildURL(0, 0, this.city);
-  }
-
-  public buildURL(lat: number, long: number, city: string) {
-    const proxy = "https://cors-anywhere.herokuapp.com/";   //proxy needed to go around http request error. 
-    var API_URL = "";
-    if(city === "") {
-      API_URL = proxy+"https://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+long+"&appid="+this.API_KEY;
-    }
-    else {
-      API_URL = proxy+"https://api.openweathermap.org/data/2.5/weather?q="+city+"&appid="+this.API_KEY;
-    }
-    
-    this.fetchAPI(API_URL);
+  //Helper function to round to 2 digits. 
+  public roundDigits(temp: number) : number {
+    return Math.round(temp * 100) / 100;
   }
 
  
