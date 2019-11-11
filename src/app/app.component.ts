@@ -1,11 +1,9 @@
 import {AfterViewInit, Component, Inject, APP_ID} from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { callbackify } from 'util';
 import { LocationStrategy } from '@angular/common';
 
 /*
   TODO - 
-    5. Clean outfit imgs & display based on weather. 
     6. Dynamic background based on time of day. 
 */
 
@@ -20,6 +18,8 @@ export class AppComponent implements AfterViewInit {
   public API_KEY: string = "8300f2d4182612b5d44c3fcb22ca0acc";
   public ICON_URL: string = "http://openweathermap.org/img/wn/";
 
+  public imagePath: string = "../assets/graphics/outfits/"
+
   //Variables holding fields for UI components.
   public city: string;  
   public rawTemperature: number; 
@@ -33,17 +33,19 @@ export class AppComponent implements AfterViewInit {
   public temperatureUnit: HTMLElement;
   public conditionTag: HTMLElement; 
   public iconImage: HTMLImageElement; 
-  public outfitImage: HTMLElement;
+  public outfitImage: HTMLImageElement;
   public searchBar: HTMLInputElement;
 
+  //Flag to switch between temperature units. 
   public celsiusTemp: boolean = false;
 
-  public averageOutfits: Array<String> = ["Average 1", "Average 2", "Average 3", "Average 4"];
-  public chillOutfits: Array<String> = ["Chill 1", "Chill 2", "Chill 3", "Chill 4", "Chill 5"]
-  public coldOutfits: Array<String> = ["Cold 1", "Cold 2", "Cold 3"]
-  public warmOutfits: Array<String> = ["Warm 1", "Warm 2", "Warm 3", "Warm 4"]
+  //File names for the outfit images in assets folder. 
+  public averageOutfits: Array<string> = ["Average 1", "Average 2", "Average 3", "Average 4"];
+  public chillOutfits: Array<string> = ["Chill 1", "Chill 2", "Chill 3", "Chill 4", "Chill 5"]
+  public coldOutfits: Array<string> = ["Cold 1", "Cold 2", "Cold 3"]
+  public warmOutfits: Array<string> = ["Warm 1", "Warm 2", "Warm 3", "Warm 4"]
 
-  constructor(private httpClient: HttpClient) {}
+  constructor() {}
 
   ngAfterViewInit() {
     //Initialize HTML elements for DOM objects to access.
@@ -52,7 +54,7 @@ export class AppComponent implements AfterViewInit {
     this.temperatureUnit = document.getElementById("temperature-unit");
     this.conditionTag = document.getElementById("temperature-condition");
     this.iconImage = document.getElementById("location-icon") as HTMLImageElement;
-    this.outfitImage = document.getElementById("outfit");
+    this.outfitImage = document.getElementById("outfit") as HTMLImageElement;
     this.searchBar = document.getElementById("search_bar") as HTMLInputElement;
 
     //Focus is when you are inside the search_bar.
@@ -129,6 +131,28 @@ export class AppComponent implements AfterViewInit {
     this.temperatureTag.innerHTML = this.roundDigits(formattedTemperature) + "";
 
     var outfit: string = this.chooseOutfit();
+
+    if(outfit === "cold") {
+      const outfitID : number = Math.floor(Math.random() * 3)
+      const outfitName: string = this.coldOutfits[outfitID];
+      this.outfitImage.src = this.imagePath + outfitName + ".png";
+    }
+    if(outfit == "chill") {
+      const outfitID : number = Math.floor(Math.random() * 5)
+      const outfitName: string = this.chillOutfits[outfitID];
+      this.outfitImage.src = this.imagePath + outfitName + ".png";
+    }
+    if(outfit == "average") {
+      const outfitID : number = Math.floor(Math.random() * 4)
+      const outfitName: string = this.averageOutfits[outfitID];
+      this.outfitImage.src = this.imagePath + outfitName + ".png";
+    }
+    if(outfit == "warm") {
+      const outfitID : number = Math.floor(Math.random() * 4)
+      const outfitName: string = this.warmOutfits[outfitID];
+      this.outfitImage.src = this.imagePath + outfitName + ".png";
+    }
+
   }
 
   public chooseOutfit() : string {
@@ -136,7 +160,7 @@ export class AppComponent implements AfterViewInit {
     const outfitType: string = this.getOutfitType(temp)
 
     console.log(outfitType);
-    return ""
+    return outfitType;
   }
 
   public getOutfitType(temp: number) : string {
@@ -175,14 +199,3 @@ export class AppComponent implements AfterViewInit {
 
  
 }
-
-
-
-
- //Reverse geocode to get city of the current location
-  // public updateCity(lat: number, long: number) {
-  //   const reverse = require('reverse-geocode')
-  //   let geoDataString : string = JSON.stringify(reverse.lookup(lat, long, 'us')); 
-  //   let geoData = JSON.parse(geoDataString);
-  //   this.city = geoData.city; 
-  // }
