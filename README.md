@@ -18,6 +18,9 @@ https://github.com/angular/angular-cli/blob/master/docs/documentation/stories/pr
 
 you need a proxy to make api calls to localhost. Otherwise you would use a custom server endpoint and would fetch as normal.
 
+example of putting an express app on the cloud, serverless: https://www.freecodecamp.org/news/express-js-and-aws-lambda-a-serverless-love-story-7c77ba0eaa35/
+
+notice how app.listen will only run when testing locally. Otherwise we export the logic to run on lambda and don't do app.listen.
 
 # Climacloset
 
