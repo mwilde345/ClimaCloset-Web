@@ -43,6 +43,7 @@ export class AppComponent implements AfterViewInit {
   public iconImage: HTMLImageElement; 
   public outfitImage: HTMLImageElement;
   public searchBar: HTMLInputElement;
+  public apiTest: HTMLElement;
 
   //Flag to switch between temperature units. 
   public celsiusTemp: boolean = false;
@@ -64,6 +65,7 @@ export class AppComponent implements AfterViewInit {
     this.iconImage = document.getElementById("location-icon") as HTMLImageElement;
     this.outfitImage = document.getElementById("outfit") as HTMLImageElement;
     this.searchBar = document.getElementById("search_bar") as HTMLInputElement;
+    this.apiTest = document.getElementById("api-test");
 
     //Focus is when you are inside the search_bar => extend bar. 
     this.searchBar.addEventListener('focus', () => {
@@ -80,9 +82,19 @@ export class AppComponent implements AfterViewInit {
     });
 
     this.locate();    //Start with user location => locate & call API with user coordinates. 
-
+    this.testAPI();
   }
 
+  public testAPI() {
+    fetch('/api/test')
+    .then(data => {
+      return data.json()
+    })
+    .then(jsonData => {
+      console.log(jsonData);
+      this.apiTest.innerHTML = JSON.stringify(jsonData); 
+    });
+  }
 
   //Locate user on startup. 
   public locate() {    
